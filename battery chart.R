@@ -5,8 +5,8 @@ library(ggplot2)
 ###################Battery plot
 # example data: 
 df <- tibble(player = c("Player1", "Player2", "Player3", "Player4"),
-                 value = c(2500, 3500, 4000, 4900),
-                 max = sample(5000:5500, 4))
+             value =  sample(2500:5000, 4),
+             max = sample(5000:5500, 4))
 
 # scale data: 
 df <- df %>% 
@@ -15,7 +15,7 @@ df <- df %>%
 
 
 ###function for colour code
-colour_func <- function(x){ifelse(x$value_scale > 90, '#800000', 
+colour_func_battery <- function(x){ifelse(x$value_scale > 90, '#800000', 
                                   ifelse(x$value_scale < 60, '#000080', '#008000'))
 }
 
@@ -26,18 +26,17 @@ ggplot(df, aes(x = player)) +
                                 colour = "black") +
   geom_text(aes(x = player, y = 100), label = paste0(round(df$value_scale,0),'%'),
             colour = "azure4", vjust = -1) +
-  scale_fill_manual(values = colour_func(df)) +
+  scale_fill_manual(values = colour_func_battery(df)) +
   labs(title ='Indication of Distance Compared to Highest',
        subtitle = 'Blue under 60%, Green 60-90%, Red over 90%') +
   xlab("") + ylab("") +
-  coord_polar(theta ='y', start= -1.57) +
   bbplot::bbc_style()
 
 
 ###################Gauge style plot
 # example data: 
 df <- tibble(player = c("Player1", "Player2", "Player3", "Player4"),
-             value = c(2500, 3500, 4000, 4900),
+             value =  sample(2500:5000, 4),
              max = sample(5000:5500, 4))
 
 # scale data: 
@@ -50,8 +49,8 @@ df <- df %>%
 df_sub <- filter(df, player != "A")
   
 ###function for colour code
-colour_func <- function(x){ifelse(x$value_scale > 90, '#800000', 
-                                  ifelse(x$value_scale < 60, '#000080', '#008000'))
+colour_func_gauge <- function(x){ifelse(x$value_sc_half > 45, '#800000', 
+                                  ifelse(x$value_sc_half < 30, '#000080', '#008000'))
 }
 
 ggplot(df, aes(x = player)) + 
@@ -63,13 +62,22 @@ ggplot(df, aes(x = player)) +
            colour = "black") +
   geom_text(data=df_sub, aes(x = player, y = 50), label = paste0(round(df_sub$value_scale,0),'%'),
             colour = "azure4", vjust = -1) +
-  scale_fill_manual(values = colour_func(df)) +
+  scale_fill_manual(values = colour_func_gauge(df_sub)) +
   labs(title ='Indication of Distance Compared to Highest',
        subtitle = 'Blue under 60%, Green 60-90%, Red over 90%') +
   xlab("") + ylab("") +
+  geom_text(data=df_sub, hjust = 1.02, size = 4, 
+            aes(x = player, y = 0, label = player), angle = 70) +
   theme_classic()+
-  coord_polar(theta ='y', start= -1.57) +
+  coord_polar(theta = "y",start=-pi/2) +
+  ylim(0,100) +
   theme(axis.text = element_blank(), 
         axis.ticks = element_blank(),
         axis.line = element_blank(),
-        plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "pt"))
+        legend.position = "top",
+        legend.text.align = 0,
+        legend.background = ggplot2::element_blank(),
+        legend.title = ggplot2::element_blank(),
+        legend.key = ggplot2::element_blank(),
+        legend.text = ggplot2::element_text(size=18,
+                                            color="#222222"))
